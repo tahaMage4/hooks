@@ -41,3 +41,47 @@ const useHttp = (requstConfig, applydata) => {
 }
 
 export default useHttp;
+
+
+// Use in compontent
+
+// Get
+const { loading, error, sendRequest } = useHttp({
+   url: 'your-get-url',
+   method: 'GET',
+}, yourDataHandlerFunction);
+sendRequest();
+
+
+// post
+
+const { loading, error, sendRequest } = useHttp({
+   url: 'your-post-url',
+   method: 'POST',
+   headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer',
+   },
+   body: { /* your request body data */ },
+}, yourDataHandlerFunction);
+sendRequest();
+
+// or
+// For a POST request:
+const { loading, error, sendRequest } = useHttp();
+sendRequest({
+   url: 'your-post-url',
+   method: 'POST',
+   headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer',
+   },
+   body: { /* your request body data */ },
+   onSuccess: (data) => {
+      // Handle successful response data
+   },
+   onError: (errorMessage) => {
+      // Handle errors
+   },
+});
+

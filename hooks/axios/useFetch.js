@@ -1,8 +1,5 @@
 import { useDebugValue, useEffect, useState } from "react";
 import axios from "axios";
-import { getSessionToken } from "@shopify/app-bridge-utils";
-import { useAppBridge } from "@shopify/app-bridge-react";
-import Swal from "sweetalert2";
 
 
 const useFetch = (url) => {
@@ -12,49 +9,45 @@ const useFetch = (url) => {
 
    const app = useAppBridge();
 
-    const fetchdata = () => {
+    const fetchdata = async () => {
+        setLoading(true);
         try {
-            setLoading(true);
-            getSessionToken(app)
-                .then(async (token) => {
-                    const res = await axios.get(url, {
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: "Bearer " + token,
-                        },
-                    })
-                    setResponse(res.data);
-                })
-                .catch((error) => {
-                    console.log("then catch", error);
-                    setError(true);
-                });
+            const response = await axios.get(url);
+            setResponse(response.data);
         }
         catch (error) {
-            Swal.fire({
-                icon: "error",
-                title: "Error on fetch the data",
-                text: error,
-                showClass: {
-                    popup: "animate__animated animate__fadeInDown",
-                },
-                hideClass: {
-                    popup: "animate__animated animate__fadeOutUp",
-                },
-            });
-            setError(true);
+            console.log(error);
         }
-        setLoading(false);
-    };
+        setError(true);
+        }
+    setLoading(false);
+};
 
 
 
-    useEffect(() => {
-        fetchdata();
-    }, [url]);
+// mount the request
+useEffect(() => {
+    fetchdata();
+}, [url]);
+
+
+// reFetch the request
+const reFetch = async () => {
+    setLoading(true);
+    try {
+        const res = await axios.get(url);
+        setData(res.data);
+    } catch (err) {
+        console.log(err);
+        setError(err);
+    }
+    setLoading(false);
+};
+
    // for debug the data in custom hooks
    useDebugValue(response ?? 'loading.....');
-   return [response, loading, error];
-}
+return { response, loading, error, reFetch }
+
+
 
 export default useFetch;
